@@ -150,20 +150,13 @@
                                 type="number" @input="calculateDimensions()" min="10" max="64" step="2"
                                 v-model="text.size">
                             <select v-model="text.weight"
-                                class="form-select text-sm mt-1 ml-2 h-6 p-1 pr-6 focus:ring focus:ring-pink-400"
+                                class="form-select text-sm mt-1 ml-2 w-28 p-0 pl-2 h-6 pr-6 focus:ring focus:ring-pink-400"
                                 name="fontWeight">
-                                <option value="font-thin">Thin</option>
-                                <option value="font-extralight">Extralight</option>
-                                <option value="font-light">Light</option>
-                                <option value="font-normal">Normal</option>
-                                <option value="font-medium">Medium</option>
-                                <option value="font-semibold">Semibold</option>
-                                <option value="font-bold">Bold</option>
-                                <option value="font-extrabold">Extrabold</option>
-                                <option value="font-black">Black</option>
+                                <option :key="weight.value" v-for="weight of fontWeightOptions[text.family]"
+                                    :selected="weight.selected" :value="weight.value">{{weight.description}}</option>
                             </select>
-                            <select v-model="text.family"
-                                class="form-select text-sm mt-1 ml-2 h-6 p-1 pr-6 focus:ring focus:ring-pink-400"
+                            <select v-model="text.family" @change="setFontWeight"
+                                class="form-select text-sm mt-1 ml-2 w-28 p-0 pl-2 h-6 pr-6 focus:ring focus:ring-pink-400"
                                 name="dropShadow">
                                 <option value="font-sans">Sans</option>
                                 <option value="font-serif">Serif</option>
@@ -196,7 +189,7 @@
                         </div>
                         <div class="w-full my-2 flex flex-wrap">
                             <select v-model="text.dropShadow"
-                                class="form-select text-sm mt-1 ml-2 h-6 p-1 pr-6 focus:ring focus:ring-pink-400"
+                                class="form-select text-sm mt-1 ml-2 w-28 p-0 pl-2 h-6 pr-6  focus:ring focus:ring-pink-400"
                                 name="dropShadow">
                                 <option value="drop-shadow-sm">Small</option>
                                 <option value="drop-shadow">Normal</option>
@@ -274,7 +267,7 @@
                     weight: 'font-semibold',
                     family: 'font-sans',
                     size: 22,
-                    color: '#000',
+                    color: '#000000',
                     dropShadow: 'drop-shadow-none',
                     textOpacity: 100,
                     backgroundColor: '#ffffff',
@@ -408,8 +401,34 @@
                         document.execCommand('selectAll', false, null);
                     })
                 },
+                setFontWeight() {
+                    this.text.weight = 'font-normal'
+                }
             },
             computed: {
+                fontWeightOptions() {
+                    return {
+                        'font-sans': [
+                            { value: 'font-thin', description: 'Thin' },
+                            { value: 'font-extralight', description: 'Extra light' },
+                            { value: 'font-light', description: 'Light' },
+                            { value: 'font-normal', description: 'Normal' },
+                            { value: 'font-medium', description: 'Medium' },
+                            { value: 'font-semibold', description: 'Semi-bold' },
+                            { value: 'font-bold', description: 'Bold' },
+                            { value: 'font-extrabold', description: 'Extra bold' },
+                            { value: 'font-black', description: 'Black' }
+                        ],
+                        'font-serif': [
+                            { selected: true, value: 'font-normal', description: 'Normal' },
+                            { value: 'font-bold', description: 'Bold' }
+                        ],
+                        'font-mono': [
+                            { selected: true, value: 'font-normal', description: 'Normal' },
+                            { value: 'font-bold', description: 'Bold' }
+                        ]
+                    }
+                },
                 imageUrl() {
                     let result = ''
                     if (this.image.seed) {
@@ -450,6 +469,9 @@
                     Object.keys(this.$data).forEach(key => {
                         this[key] = saveState[key]
                     })
+                }
+                if (this.text.color === '#000') {
+                    this.text.color = '#000000'
                 }
             },
             updated() {
